@@ -1,0 +1,30 @@
+
+.number-input {
+    background-color: rgb(197, 220, 232);
+    border: 1px;
+    border-style: solid;
+    border-color: rgb(24, 100, 171);
+    color: rgb(36, 36, 36);
+}
+
+.text-input {
+    background-color: rgb(197, 220, 232);
+    border: 1px;
+    border-style: solid;
+    border-color: rgb(24, 100, 171);
+    color: rgb(36, 36, 36);
+}
+
+.next-button {
+    background-color: rgb(24, 100, 171);
+    font-size: 20px;
+
+}
+
+.next-button:disabled {
+    background-color: rgb(147, 171, 207);
+}
+
+.next-button:hover {
+    background-color: rgb(147, 171, 207);
+}

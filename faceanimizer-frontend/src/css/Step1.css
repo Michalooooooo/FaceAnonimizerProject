@@ -1,0 +1,13 @@
+.next-button {
+    background-color: rgb(24, 100, 171);
+    font-size: 20px;
+
+}
+
+.next-button:disabled {
+    background-color: rgb(147, 171, 207);
+}
+
+.next-button:hover {
+    background-color: rgb(147, 171, 207);
+}

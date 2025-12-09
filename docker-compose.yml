@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+
+  backend:
+    build:
+      context: ./FaceAnimizerBackend
+      dockerfile: Dockerfile
+    container_name: faceanimizer-backend
+    working_dir: /faceanimizer_backend
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    gpus: "all"
+
+  frontend:
+    build:
+      context: ./faceanimizer-frontend
+      dockerfile: Dockerfile
+    container_name: faceanimizer-frontend
+    working_dir: /src
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    command: ["npm", "run", "dev", "--", "--host"]
+    depends_on:
+      - backend

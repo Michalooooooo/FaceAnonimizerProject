@@ -1,0 +1,16 @@
+.stepper-wrapper {
+    width: 100%;
+    display: flex;           
+    justify-content: center; 
+    align-items: flex-start; 
+    padding-top: 20px;       
+    height: 10vh;            
+}
+
+.stepper {
+    width: 100%;
+    justify-content: space-evenly;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
