@@ -23,11 +23,14 @@ class FaceAnimizer:
     def __enter__(self):
         self._input_av = av.open(self._in_video_path)
         self._output_av = av.open(self._out_video_path, mode='w', format='mp4')
+        self._input_video_stream = None
+        self._input_audio_stream = None
+        self._input_video_stream = next((s for s in self._input_av.streams if s.type == 'video'), None)
+        self._input_audio_stream = next((s for s in self._input_av.streams if s.type == 'audio'), None)
 
-        self._input_video_stream = next(s for s in self._input_av.streams if s.type == 'video')
-        self._input_audio_stream = next(s for s in self._input_av.streams if s.type == 'audio')
-
-        self._output_audio_stream = self._output_av.add_stream_from_template(template=self._input_audio_stream)
+        self._output_audio_stream = None
+        if self._input_audio_stream is not None:
+            self._output_audio_stream = self._output_av.add_stream_from_template(template=self._input_audio_stream)
 
         self._output_video_stream = self._output_av.add_stream(
             codec_name='libx264',
@@ -74,7 +77,7 @@ class FaceAnimizer:
                     for out_packet in self._output_video_stream.encode(new_frame):
                         self._output_av.mux(out_packet)
 
-            elif packet.stream == self._input_audio_stream:
+            elif packet.stream == self._input_audio_stream and self._input_audio_stream is not None:
                 if packet.dts is None:
                     continue
                 packet.stream = self._output_audio_stream

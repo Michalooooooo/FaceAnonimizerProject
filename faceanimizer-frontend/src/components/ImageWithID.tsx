@@ -37,7 +37,7 @@ const ImageWithId: React.FC<ImageWithIdProps> = ({ id, url, selected = false, on
           transition: "opacity 0.2s",
         }}
       />
-      <div
+      {/* <div
         style={{
           position: "absolute",
           top: "5px",
@@ -51,7 +51,7 @@ const ImageWithId: React.FC<ImageWithIdProps> = ({ id, url, selected = false, on
         }}
       >
         {id}
-      </div>
+      </div> */}
     </div>
   );
 };

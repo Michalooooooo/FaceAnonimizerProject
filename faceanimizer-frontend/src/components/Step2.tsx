@@ -147,7 +147,6 @@ function Step2({ onSubmit, previous }: { onSubmit: (values: any) => void, previo
                             <NumberInput label="Distance Threshold" {...form.getInputProps('norfair_params.distance_threshold')} styles={inputStyles} />
                             <NumberInput label="Hit Counter Max" {...form.getInputProps('norfair_params.hit_counter_max')} styles={inputStyles} />
                             <NumberInput label="Initialization Delay" {...form.getInputProps('norfair_params.initialization_delay')} styles={inputStyles} />
-                            <NumberInput label="Pointwise Hit Counter Max" {...form.getInputProps('norfair_params.pointwise_hit_counter_max')} styles={inputStyles} />
                             <NumberInput label="Detection Threshold" step={0.1} {...form.getInputProps('norfair_params.detection_threshold')} styles={inputStyles} />
                             <NumberInput label="Past Detections Length" {...form.getInputProps('norfair_params.past_detections_length')} styles={inputStyles} />
 
