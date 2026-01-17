@@ -7,8 +7,27 @@ import torch
 import uvicorn
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+import onnxruntime as ort
+from contextlib import asynccontextmanager
+from app.config import VIDEO_PROCESSING_PATH
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    model_path = VIDEO_PROCESSING_PATH / 'emb_models' / 'w600k_r50_batch_f16.onnx'
+        
+    so = ort.SessionOptions()
+    so.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+    so.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+
+    app.state.emb_session = ort.InferenceSession(model_path, providers=["CUDAExecutionProvider"])
+    
+    print("Model loaded!")
+
+    yield 
+
+    print("Application shutdown!")
+    
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(upload_router)
 app.include_router(video_processing_router)
@@ -24,9 +43,10 @@ app.add_middleware(
     allow_headers=["*"],   # wszystkie nagłówki
 )
 
+
+
 @app.get("/")
 def root():
     return {"message": "Cuda dziala" if torch.cuda.is_available() else 'Cuda nie dziala'}
 
-# if __name__ == "__main__":
-#     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+

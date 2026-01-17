@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.services.video_processing.processing.FaceAnimizer import FaceAnimizer
+from app.services.video_processing.processing.FaceAnonimizer import FaceAnonimizer
 from app.models.models import AnonimizeRequest
 import traceback
 from typing import List, Dict
@@ -16,7 +16,7 @@ async def anonimize_video(video_id: str, request: AnonimizeRequest):
     if faces_list is None:
         raise ValueError('Faces list is None!')
 
-    with FaceAnimizer(video_id, faces_list, rotate) as fa:
+    with FaceAnonimizer(video_id, faces_list, rotate) as fa:
         try:
             fa.anonimize_video()
         except Exception as e:

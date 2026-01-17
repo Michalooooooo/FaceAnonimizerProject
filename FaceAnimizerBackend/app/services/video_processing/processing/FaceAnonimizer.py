@@ -8,7 +8,7 @@ import traceback
 import os
 import shutil
 
-class FaceAnimizer:
+class FaceAnonimizer:
     def __init__(self, _id: str, faces_list: List[int], rotation: bool = False):
         self._id = _id
         self._faces_list = faces_list
@@ -68,7 +68,6 @@ class FaceAnimizer:
                         img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
 
                     processed_img = self._blur_faces_on_frame(img)
-                    # processed_img = self._draw_face_ids_on_frame(img)
                     self._frame_id += 1
 
                     new_frame = av.VideoFrame.from_ndarray(processed_img, format='bgr24')
@@ -85,9 +84,6 @@ class FaceAnimizer:
 
         for out_packet in self._output_video_stream.encode():
             self._output_av.mux(out_packet)
-
-        print(f'Zarejestrowana liczba klatek w FaceAnimizer: {self._frame_id}')
-
 
     def _blur_faces_on_frame(self, frame: np.ndarray):
         frame_data = self._json_dict.get(self._frame_id, [])
@@ -117,27 +113,21 @@ class FaceAnimizer:
                 x2 = fd.get('x2')
                 y2 = fd.get('y2')
 
-                # Tekst do wypisania
                 text = str(fd.get('face_id'))
 
-                # Parametry tekstu
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 font_scale = 1
                 font_thickness = 2
-                color = (0, 255, 0)  # zielony
+                color = (0, 255, 0)
 
-                # Obliczanie szerokości i wysokości tekstu
                 (text_width, text_height), _ = cv2.getTextSize(text, font, font_scale, font_thickness)
 
-                # Środek bboxa
                 center_x = x1 + (x2 - x1) // 2
                 center_y = y1 + (y2 - y1) // 2
 
-                # Punkt startowy tekstu (lewy-dolny w OpenCV)
                 text_x = center_x - text_width // 2
                 text_y = center_y + text_height // 2
 
-                # Rysujemy tekst
                 cv2.putText(frame, text, (text_x, text_y), font, font_scale, color, font_thickness, cv2.LINE_AA)
 
         return frame

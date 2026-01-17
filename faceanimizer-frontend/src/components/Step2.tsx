@@ -4,7 +4,7 @@ import { useState } from 'react';
 import "../css/Step2.css";
 
 function Step2({ onSubmit, previous }: { onSubmit: (values: any) => void, previous: (values: any) => void }) {
-    const [disableREID, setDisableREID] = useState(false);
+    const [disableREID, setDisableREID] = useState(true);
 
     const form = useForm({
         validateInputOnChange: true,
@@ -12,17 +12,17 @@ function Step2({ onSubmit, previous }: { onSubmit: (values: any) => void, previo
         initialValues: {
             norfair_params: {
                 distance_function: 'mean_euclidean',
-                distance_threshold: 30,
-                hit_counter_max: 10,
+                distance_threshold: 50,
+                hit_counter_max: 20,
                 initialization_delay: 2,
                 reid_distance_function: 'cosine',
                 pointwise_hit_counter_max: 0,
                 detection_threshold: 0.4,
                 past_detections_length: 5,
-                reid_distance_threshold: 0.2,
-                reid_hit_counter_max: 300,
+                reid_distance_threshold: 0.3,
+                reid_hit_counter_max: 2000,
             },
-            yolo_model: 'yolo11s_reduced_dataset',
+            yolo_model: 'yolo11n_100epch',
             yolo_batch_size: 32,
             yolo_params: {
                 conf: 0.4,
@@ -114,8 +114,13 @@ function Step2({ onSubmit, previous }: { onSubmit: (values: any) => void, previo
                             <Select
                                 label="YOLO Model"
                                 data={[
-                                    { value: 'yolo11s_reduced_dataset', label: 'yolo11s_reduced_dataset' },
-                                    { value: 'yolo11n_FDDB', label: 'yolo11n_FDDB' },
+                                    { value: 'yolo11n_100epch', label: 'YOLO11n_100epch' },
+                                    { value: 'yolo10n', label: 'YOLO10n' },
+                                    { value: 'yolo10s', label: 'YOLO10s' },
+                                    { value: 'yolo11n', label: 'YOLO11n' },
+                                    { value: 'yolo11s', label: 'YOLO11s' },
+                                    { value: 'yolo12n', label: 'YOLO12n' },
+                                    { value: 'yolo12s', label: 'YOLO12s' },
                                 ]}
                                 {...form.getInputProps('yolo_model')}
                                 onChange={(v: string | null) => {
@@ -151,7 +156,7 @@ function Step2({ onSubmit, previous }: { onSubmit: (values: any) => void, previo
                             <NumberInput label="Past Detections Length" {...form.getInputProps('norfair_params.past_detections_length')} styles={inputStyles} />
 
                             <Switch
-                                label="Activate REID"
+                                label="Activate/Deactivate REID"
                                 checked={disableREID}
                                 onChange={(e) => setDisableREID(e.currentTarget.checked)}
                                 styles={inputStyles}

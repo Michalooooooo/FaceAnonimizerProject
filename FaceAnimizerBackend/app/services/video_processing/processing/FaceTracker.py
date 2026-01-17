@@ -9,6 +9,11 @@ class FaceTracker:
         self.tracker = Tracker(**new_params)
         self.detections = []
         self.tracks = {}
+    
+    def clear_tracker(self):
+        del self.tracker
+        del self.detections
+        del self.tracks
 
     def build_detections(self, boxes: np.ndarray, confidences: np.ndarray, embeddings: np.ndarray):
 
@@ -25,9 +30,6 @@ class FaceTracker:
     def update(self):
 
         tracked_objects = self.tracker.update(self.detections)  
-        for obj in tracked_objects:
-            missed = obj.age - obj.hit_counter
-            # print(f"ID: {obj.global_id}, hits: {obj.hit_counter}, missed: {missed}, age: {obj.age}")
 
         self.detections.clear()
         return tracked_objects

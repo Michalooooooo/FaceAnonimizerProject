@@ -17,7 +17,6 @@ def cosine(candidate: TrackedObject, track: TrackedObject):
     track_emb = normalize(track_emb)
     
     distance = 1 - np.dot(candidate_emb, track_emb)
-    # print(distance)
     return distance
 
 def euclidean(candidate: TrackedObject, track: TrackedObject):

@@ -3,13 +3,12 @@ import numpy as np
 import cv2
 from ultralytics import YOLO
 from app.services.video_processing.processing.model_registry import MODEL_REGISTRY
-from typing import Dict, Optional
+from typing import Dict
 
 class FaceDetector:
     def __init__(self, model: str):
         try:
             model_path = MODEL_REGISTRY.get(model, None)
-            # print(f'TUTAJ JEST PRINT MODEL_PATH!!!!!!!!!!! {model_path}')
             self.model = YOLO(model_path)
         except Exception as e:
             print(f'Exception in FaceDetector class | {e}')
@@ -70,12 +69,13 @@ class FaceDetector:
             for result in xyxy:
                 x1, y1, x2, y2 = map(int, result)
                 roi = frame[:, y1:y2, x1:x2]
-                # Transforming roi to (H, W, C)
                 roi = roi.cpu().numpy()
                 roi = np.transpose(roi, (1, 2, 0))
                 lst.append(roi)
             crops_list.append(lst)
-            # print(f'Liczba detekcji na klatke: {len(lst)}')
 
 
         return results_list, conf_list, crops_list
+    
+    def clear_gpu(self):
+        del self.model

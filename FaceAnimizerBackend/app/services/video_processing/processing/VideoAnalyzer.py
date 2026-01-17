@@ -15,9 +15,10 @@ from app.config import BASE_DIR_PATH
 import uuid
 from urllib.parse import quote
 from pprint import pprint
+import torch
 
 class VideoAnalyzer:
-    def __init__(self, in_video_path: str, processing_params: Optional[Dict] = None):
+    def __init__(self, in_video_path: str, emb_session, processing_params: Optional[Dict] = None):
 
         self._in_video_path     = in_video_path
         self._processing_params = processing_params or {}
@@ -30,15 +31,14 @@ class VideoAnalyzer:
         # Processing variables
         self._itr = 0
         self.fd = FaceDetector(self._processing_params.get('yolo_model', 'yolo11n_reduced_dataset'))
-        self.fe = FaceEmbedder(show_warnings=False)
-        # print('Using: ', self._processing_params.get('norfair_params', 
-        #         {'distance_function': 'cosine', 'distance_threshold': 0.3}))
+        self.fe = FaceEmbedder(session=emb_session, show_warnings=False)
+        
         self.ft = FaceTracker(self._processing_params.get('norfair_params'))
-        print('Params: \n')
+
         pprint(self._processing_params.get('norfair_params'))
+
         self._frame_id = 0
 
-        # Archive
         self.archive = Archive()
 
         self.crops = {}
@@ -46,6 +46,7 @@ class VideoAnalyzer:
         n_params = self._processing_params.get(
             'norfair_params', None
         )
+
         if n_params is not None:
             is_reid = n_params.get('reid_distance_function', False)
         
@@ -64,6 +65,13 @@ class VideoAnalyzer:
     def __exit__(self, exc_type, exc_value, traceback):
         self._in_container.close()
         self.crops.clear()
+        self.fd.clear_gpu()
+        self.ft.clear_tracker()
+        del self.fd
+        del self.fe
+        del self.ft
+        torch.cuda.empty_cache()
+        print('Memory cleared')
 
     def process_video(self):
         # Processing variables
@@ -121,7 +129,6 @@ class VideoAnalyzer:
                 self.archive.add_frame_data(self._frame_id, frame_tr_objs)
                 self._frame_id += 1
 
-        print(f'Zarejestrowana liczba klatek w VideoAnalyzer: {self._frame_id}')
 
     def get_crops(self):
         """
@@ -187,24 +194,19 @@ class VideoAnalyzer:
     
     def _update_crops(self, tracked_objects: List[TrackedObject], frame: np.ndarray):
         for obj in tracked_objects:
-            # Tworzymy crop tylko jeśli global_id jeszcze nie istnieje w self.crops
             if obj.global_id in self.crops:
-                continue  # już mamy crop, nie ruszamy
+                continue  
 
-            # Spróbuj wziąć bieżącą detekcję
             det = getattr(obj, 'last_detection', None)
             if det is not None and det.data.get('bbox', None):
                 points = det.data['bbox']
             else:
-                # Fallback: przewidywana pozycja z trackera
-                points = obj.estimate_as_bbox()  # musi zwrócić 4 punkty: top_l, top_r, bottom_l, bottom_r
+                points = obj.estimate_as_bbox()  
 
             top_l, top_r, bottom_l, bottom_r = points
 
-            # Wycinamy crop z ramki
             crop = frame[top_l[1]:bottom_r[1], top_l[0]:bottom_r[0]]
 
-            # Zapisujemy crop dla global_id tylko raz
             self.crops[obj.global_id] = crop
 
     def _rescale_boxes(self, boxes_list, size):
@@ -229,8 +231,8 @@ class VideoAnalyzer:
                 rescaled_list.append(frame_boxes)
                 continue
             frame_rescaled = frame_boxes.copy()
-            frame_rescaled[:, [0, 2]] = frame_rescaled[:, [0, 2]] * scale_x  # x1, x2
-            frame_rescaled[:, [1, 3]] = frame_rescaled[:, [1, 3]] * scale_y  # y1, y2
+            frame_rescaled[:, [0, 2]] = frame_rescaled[:, [0, 2]] * scale_x  
+            frame_rescaled[:, [1, 3]] = frame_rescaled[:, [1, 3]] * scale_y  
             rescaled_list.append(frame_rescaled)
             
         return rescaled_list

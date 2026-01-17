@@ -10,13 +10,13 @@ from fastapi import Request
 router = APIRouter()
 
 @router.post('/analyze-video/{video_id}')
-def analyze_video(video_id, processing_params: ProcessingParams):
+def analyze_video(request: Request, video_id, processing_params: ProcessingParams):
     in_video_path = f'{str(TEMP_VIDEOS_PATH)}/{str(video_id)}/{str(video_id)}.mp4'
 
     processing_params = processing_params.model_dump()
 
     pprint(processing_params)
-    with VideoAnalyzer(in_video_path, processing_params) as va:
+    with VideoAnalyzer(in_video_path, request.app.state.emb_session, processing_params) as va:
         
         try:
             va.process_video()
