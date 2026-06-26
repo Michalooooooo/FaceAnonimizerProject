@@ -39,8 +39,7 @@ alembic/versions/
 
 # Video processing
 app/services/video_processing/alignment_models/
-app/services/video_processing/emb_models/
-app/services/video_processing/yolo_models/
 app/services/video_processing/processing/inputs/
 app/temp_videos
-static/
+static/**/*.png
+static/**/*.jpg
